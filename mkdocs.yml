@@ -1,6 +1,6 @@
 site_name: Credit Card Fraud Detection Handbook
 site_url: https://anguyenthecrazier.github.io/251120-Credit-Card-Fraud-Detection-Handbook/
-site_description: A complete end-to-end guide for building a hybrid machine-learning credit card fraud detection system.
+site_description: A complete end-to-end analysis for building a hybrid machine-learning credit card fraud detection system by Group 6 - Queen Mary University of London MSc Risk Analytics - November 2025
 
 theme:
   name: material
