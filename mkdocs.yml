@@ -24,9 +24,6 @@ nav:
   - Interactive Demo: demo/model.md
   - Notebooks:
       - Full Fraud Detection Notebook: notebooks/Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
-  - Models: 
-      - Intro: models/index.md
-  - Appendix: appendix/index.md
   - Models:
       - Unsupervised: models/unsupervised.md
       - Supervised: models/supervised.md
