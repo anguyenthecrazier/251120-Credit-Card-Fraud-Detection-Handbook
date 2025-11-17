@@ -21,13 +21,12 @@ plugins:
 
 nav:
   - Home: index.md
-  - Interactive Demo: demo.md
+  - Interactive Demo: demo/model.md
   - Notebooks:
-      - 01 — EDA: notebooks/01_EDA.py
-      - 02 — Unsupervised Models: notebooks/02_Unsupervised_Models.py
-      - 03 — Supervised Models: notebooks/03_Supervised_Models.py
-      - 04 — Hybrid Model: notebooks/04_Hybrid_Model.py
-      - 05 — Threshold & Evaluation: notebooks/05_Threshold_and_Evaluation.py
+      - Full Fraud Detection Notebook: notebooks/Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
+  - Models: 
+      - Intro: models/index.md
+  - Appendix: appendix/index.md
   - Models:
       - Unsupervised: models/unsupervised.md
       - Supervised: models/supervised.md
