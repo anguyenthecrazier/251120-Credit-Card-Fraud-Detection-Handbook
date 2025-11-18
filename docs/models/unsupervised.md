@@ -1,9 +1,0 @@
-# Unsupervised Models
-
-This section documents anomaly detection models including:
-
-- Isolation Forest  
-- Local Outlier Factor (LOF)  
-- Autoencoder-based anomaly detection  
-
-Details include model architecture, training pipeline, and scoring techniques.
