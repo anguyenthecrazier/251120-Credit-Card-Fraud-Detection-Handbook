@@ -1,5 +1,3 @@
-# Interactive Demo
-
 # Interactive Fraud Detection Demo
 
 Welcome to the **Interactive Fraud Detection Demo** for the  
