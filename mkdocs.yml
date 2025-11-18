@@ -23,8 +23,8 @@ nav:
   - Home: index.md
   - Interactive Demo: demo/model.md
   - Notebooks:
-      - "EDA Notebook": notebooks/eda/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
-      - "Modelling Notebook": notebooks/modelling/Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
+      - EDA: notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
+      - Modelling: notebooks/Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
   - Models:
       - Unsupervised: models/unsupervised.md
       - Supervised: models/supervised.md
