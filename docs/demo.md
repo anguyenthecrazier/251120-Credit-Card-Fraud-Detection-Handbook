@@ -98,8 +98,6 @@ Isolation Forest isolates anomalies by randomly splitting the data.
 ![Isolation Forest Confusion Matrix](../images/iforest_cm.png){ width=400 }
 ![Isolation Forest ROC](../images/iforest_roc.png){ width=400 }
 
-*(Replace the image paths with your actual plot files.)*
-
 ---
 
 === "Autoencoder"
@@ -273,3 +271,4 @@ flowchart TD
     C4 --> D
     C5 --> D
     D --> E[(Final Fraud Probability)]
+```
