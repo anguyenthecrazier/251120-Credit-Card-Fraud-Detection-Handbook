@@ -257,18 +257,23 @@ Each base model outputs a score, and the meta-classifier learns how to
 
 ## 3. How the Hybrid Pipeline Works
 
-```mermaid
-flowchart TD
-    A[Raw Transaction] --> B[Feature Preprocessing<br/>Log transform, MinMax scaling]
-    B --> C1[Isolation Forest]
-    B --> C2[Autoencoder]
-    B --> C3[Random Forest]
-    B --> C4[XGBoost]
-    B --> C5[CatBoost]
-    C1 --> D[Logistic Regression<br/>Meta-Classifier]
-    C2 --> D
-    C3 --> D
-    C4 --> D
-    C5 --> D
-    D --> E[(Final Fraud Probability)]
-```
+```md
+## 3. How the Hybrid Pipeline Works
+
+### 3.1 High-level pipeline (text diagram)
+
+```text
+Raw transaction
+    ↓
+Feature preprocessing
+    (log transform, MinMax scaling)
+    ↓
+----------------------------------------------------------
+↓              ↓               ↓          ↓          ↓
+Isolation      Autoencoder     Random     XGBoost    CatBoost
+Forest                        Forest
+----------------------------------------------------------
+                       ↓
+          Logistic Regression (meta-classifier)
+                       ↓
+            Final fraud probability score
