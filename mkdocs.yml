@@ -21,7 +21,7 @@ plugins:
 
 nav:
   - Home: index.md
-  - Interactive Demo: demo/model.md
+  - Interactive Demo: model.md
   - Exploratory Data Analysis:
       - EDA: notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
   - Models:
