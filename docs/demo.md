@@ -257,23 +257,40 @@ Each base model outputs a score, and the meta-classifier learns how to
 
 ## 3. How the Hybrid Pipeline Works
 
-```md
-## 3. How the Hybrid Pipeline Works
-
-### 3.1 High-level pipeline (text diagram)
+### 3.1 Visual pipeline diagram
 
 ```text
-Raw transaction
-    ↓
-Feature preprocessing
-    (log transform, MinMax scaling)
-    ↓
-----------------------------------------------------------
-↓              ↓               ↓          ↓          ↓
-Isolation      Autoencoder     Random     XGBoost    CatBoost
-Forest                        Forest
-----------------------------------------------------------
-                       ↓
-          Logistic Regression (meta-classifier)
-                       ↓
-            Final fraud probability score
+                    ┌───────────────────────────┐
+                    │      Raw transaction      │
+                    └─────────────┬─────────────┘
+                                  │
+                                  v
+                ┌────────────────────────────────────┐
+                │   Feature preprocessing            │
+                │   • Log transform (Amount, etc.)   │
+                │   • MinMax scaling                 │
+                │   • SMOTE (training data only)     │
+                └─────────────┬──────────────────────┘
+                              │
+        ┌─────────────────────┼─────────────────────────────────────────────┐
+        │                     │                     │           │           │
+        v                     v                     v           v           v
+┌───────────────┐   ┌────────────────┐   ┌────────────────┐  ┌───────────┐ ┌───────────┐
+│ Isolation     │   │ Autoencoder    │   │ Random Forest  │  │ XGBoost   │ │ CatBoost  │
+│ Forest        │   │ (recon error)  │   │ (probability)  │  │ (prob.)   │ │ (prob.)   │
+└─────┬─────────┘   └──────┬─────────┘   └──────┬─────────┘  └────┬──────┘ └────┬──────┘
+      │                    │                    │                │             │
+      └──────────────┬─────┴──────────────┬─────┴────────────────┴─────────────┘
+                     │                    │
+                     v                    v
+              ┌──────────────────────────────────────┐
+              │ Logistic Regression meta-classifier  │
+              │ (combines all model scores)          │
+              └───────────────────┬──────────────────┘
+                                  │
+                                  v
+                    ┌───────────────────────────┐
+                    │ Final fraud probability   │
+                    │ (threshold ≈ 0.60)        │
+                    └───────────────────────────┘
+
