@@ -256,39 +256,61 @@ Each base model outputs a score, and the meta-classifier learns how to
 ## 3. How the Hybrid Pipeline Works
 
 ### 3.1 Visual pipeline diagram
+## 3. Data Pipeline Overview
+
+### 3.1 Data Processing & Modeling Pipeline (Diagram)
 
 ```text
-                    ┌───────────────────────────┐
-                    │      Raw transaction      │
-                    └─────────────┬─────────────┘
-                                  │
-                                  v
-                ┌────────────────────────────────────┐
-                │   Feature preprocessing            │
-                │   • Log transform (Amount, etc.)   │
-                │   • MinMax scaling                 │
-                │   • SMOTE (training data only)     │
-                └─────────────┬──────────────────────┘
-                              │
-        ┌─────────────────────┼─────────────────────────────────────────────┐
-        │                     │                     │           │           │
-        v                     v                     v           v           v
-┌───────────────┐   ┌────────────────┐   ┌────────────────┐  ┌───────────┐ ┌───────────┐
-│ Isolation     │   │ Autoencoder    │   │ Random Forest  │  │ XGBoost   │ │ CatBoost  │
-│ Forest        │   │ (recon error)  │   │ (probability)  │  │ (prob.)   │ │ (prob.)   │
-└─────┬─────────┘   └──────┬─────────┘   └──────┬─────────┘  └────┬──────┘ └────┬──────┘
-      │                    │                    │                │             │
-      └──────────────┬─────┴──────────────┬─────┴────────────────┴─────────────┘
-                     │                    │
-                     v                    v
-              ┌──────────────────────────────────────┐
-              │ Logistic Regression meta-classifier  │
-              │ (combines all model scores)          │
-              └───────────────────┬──────────────────┘
-                                  │
-                                  v
-                    ┌───────────────────────────┐
-                    │ Final fraud probability   │
-                    │ (threshold ≈ 0.60)        │
-                    └───────────────────────────┘
+                           DATA PIPELINE OVERVIEW
+                           =======================
 
+                       ┌────────────────────────────┐
+                       │      Raw Transaction       │
+                       │   (Time, Amount, V1–V28)   │
+                       └──────────────┬─────────────┘
+                                      │
+                                      v
+                 ┌──────────────────────────────────────────┐
+                 │            Data Preprocessing            │
+                 │------------------------------------------│
+                 │ • Remove duplicates                      │
+                 │ • Handle missing values                  │
+                 │ • Log-transform skewed features          │
+                 │ • MinMax scaling                         │
+                 │ • Train-test split                       │
+                 └──────────────┬───────────────────────────┘
+                                │
+                                v
+                 ┌──────────────────────────────────────────┐
+                 │              Data Balancing               │
+                 │-------------------------------------------│
+                 │ • Apply SMOTE to minority class           │
+                 │   (fraud = 1) on training data only       │
+                 └──────────────┬───────────────────────────┘
+                                │
+                                v
+    ┌───────────────────────────────────────────────────────────────────────────┐
+    │                                 Modeling                                  │
+    │---------------------------------------------------------------------------│
+    │ Unsupervised Models:                  Supervised Models:                  │
+    │ • Isolation Forest                    • Random Forest                     │
+    │ • Autoencoder                         • XGBoost                           │
+    │ • Local Outlier Factor (LOF)          • CatBoost                          │
+    └──────────────┬───────────────┬───────────────┬───────────────┬──────────┘
+                   │               │               │               │
+                   v               v               v               v
+        ┌────────────────┐ ┌────────────────┐ ┌────────────────┐ ┌────────────────┐
+        │  IF Score      │ │ AE Recon Error │ │ RF Probability │ │ XGB Probability │
+        └────────────────┘ └────────────────┘ └────────────────┘ └────────────────┘
+                                  │
+                                  v
+                       ┌─────────────────────────────┐
+                       │  Meta-Model (Logistic Reg.) │
+                       │ Combines all model outputs  │
+                       └──────────────┬──────────────┘
+                                      │
+                                      v
+                       ┌─────────────────────────────┐
+                       │ Final Fraud Probability     │
+                       │   (Decision Threshold ≈ .60)│
+                       └─────────────────────────────┘
