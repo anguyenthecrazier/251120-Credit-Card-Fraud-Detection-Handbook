@@ -25,10 +25,7 @@ nav:
   - Exploratory Data Analysis:
       - EDA: notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
   - Models:
-      - Unsupervised: models/unsupervised.md
-      - Supervised: models/supervised.md
-      - Hybrid: models/hybrid.md
-      - Modelling: notebooks/Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
+      - Modelling: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
   - Appendix:
       - Preprocessing Pipeline: appendix/preprocessing.md
       - Autoencoder Architecture: appendix/autoencoder_architecture.md
