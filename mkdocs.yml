@@ -16,7 +16,10 @@ theme:
 
 plugins:
   - search
-  - mkdocs-jupyter
+    - mkdocs-jupyter:
+      remove_tag_config:
+        remove_input_tags:
+          - hide-input
   - awesome-pages
 
 nav:
