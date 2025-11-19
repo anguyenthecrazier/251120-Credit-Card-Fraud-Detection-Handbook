@@ -133,8 +133,8 @@ The Hybrid model keeps **perfect recall**, **reduces false positives** further t
 This section now matches the **exact logic** used in the *Models* notebook.
 
 ```text
-                        RAW DATA
-      (Time, Amount, V1–V28, Class = 0/1, highly imbalanced)
+RAW DATA
+(Time, Amount, V1–V28, Class = 0/1, highly imbalanced)
                              │
                 ┌────────────┴────────────┐
                 │                         │
