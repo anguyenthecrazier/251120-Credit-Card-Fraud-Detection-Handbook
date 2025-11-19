@@ -26,12 +26,6 @@ nav:
       - EDA: notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
   - Models:
       - Modelling: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
-  - Appendix:
-      - Preprocessing Pipeline: appendix/preprocessing.md
-      - Autoencoder Architecture: appendix/autoencoder_architecture.md
-      - Evaluation Metrics: appendix/evaluation_metrics.md
-      - Threshold Analysis: appendix/threshold_analysis.md
-      - Misclassification Cases: appendix/misclassification.md
 
 markdown_extensions:
   - admonition
