@@ -26,6 +26,7 @@ nav:
       - EDA: notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
   - Models:
       - Modelling: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
+  - Conclusion: conclusion.md
 
 markdown_extensions:
   - admonition
