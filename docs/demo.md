@@ -162,48 +162,73 @@ FINAL FRAUD PROBABILITY
 (Optimised decision threshold ≈ 0.60)
 ```
 
+### Unsupervised Branch
 
-UNSUPERVISED BRANCH
--------------------
-1. Log-transform highly skewed features
-   • For each feature except Class, if |skew| > 0.75 → apply custom log transform.
-2. MinMax scaling
-   • Scale all features (Time, V1–V28, Amount) into a common range → X_scaled.
-3. Train anomaly detectors on the FULL X_scaled, y:
-   • Isolation Forest, One-Class SVM, LOF, Autoencoder.
-4. Build high-correlated subset for improved unsupervised models:
-   • Keep only 11 features with |corr(Class)| ≥ 0.1 and repeat anomaly detection.
+- **Log-transform highly skewed features**  
+  - For each feature (except `Class`), if \|skew\| > 0.75, apply a custom log transform.
 
-SUPERVISED BRANCH
------------------
-1. Work in the ORIGINAL feature space (no MinMax scaling here).
-2. Apply SMOTE on df (all 30 features):
-   • Balance Class 0 and Class 1 → X_res, y_res.
-3. Train-test split on the SMOTE data:
-   • (X_train, X_test, y_train, y_test).
-4. Train supervised models:
-   • Random Forest, XGBoost, CatBoost, AdaBoost, LightGBM.
-5. Re-evaluate trained models on the FULL original dataset df
-   • to mimic real-life deployment (heavily imbalanced data).
+- **MinMax scaling**  
+  - Scale all features (`Time`, `Amount`, `V1–V28`) into a common range → `X_scaled`.
 
-HYBRID MODEL
-------------
-1. From the UNSUPERVISED branch (on scaled data):
-   • iso_score  = Isolation Forest score on X_scaled
-   • ae_mse     = Autoencoder reconstruction error on X_scaled
-   • (and, for Model 2, the same but trained on the 11 high-correlated features)
+- **Train anomaly detectors on the full scaled data**  
+  - Fit and evaluate on `X_scaled`, `y` using:  
+    - Isolation Forest  
+    - One-Class SVM  
+    - Local Outlier Factor (LOF)  
+    - Autoencoder
 
-2. From the SUPERVISED branch (trained on SMOTE, predicted on full df):
-   • rf_pred   = Random Forest P(Class=1)
-   • xgb_pred  = XGBoost P(Class=1)
-   • cat_pred  = CatBoost P(Class=1)
+- **High-correlation subset for improved anomaly detection**  
+  - Select only the **11 features** with \|corr(`Class`)\| ≥ 0.1.  
+  - Repeat the anomaly-detection experiments on this reduced feature set to see if performance improves.
 
-3. Stack all these into a hybrid feature set:
-   • [iso_score, ae_mse, rf_pred, xgb_pred, cat_pred].
+---
 
-4. Train Logistic Regression meta-model on the full dataset:
-   • Choose threshold ≈ 0.60 to maximise F1.
+### Supervised Branch
 
-5. Output:
-   • Final fraud probability + binary decision
-   • Achieves 0 false negatives and only 20 false positives.
+- **Original feature space**  
+  - Use the **original** features (no MinMax scaling) for supervised learning.
+
+- **SMOTE oversampling**  
+  - Apply **SMOTE** to the full 30-feature dataset  
+    → balanced training data: `X_res`, `y_res`.
+
+- **Train–test split on the SMOTE data**  
+  - Split into `X_train`, `X_test`, `y_train`, `y_test`.
+
+- **Train supervised models**  
+  - Random Forest  
+  - XGBoost  
+  - CatBoost  
+  - AdaBoost  
+  - LightGBM
+
+- **Evaluate on the full original dataset**  
+  - Use the models trained on SMOTE data to predict on the **full imbalanced dataset** (`df`)  
+  - This mimics **real-world deployment**, where fraud is rare.
+
+---
+
+### Hybrid Model
+
+- **Inputs from the Unsupervised Branch (on scaled data)**  
+  - `iso_score` = Isolation Forest anomaly score on `X_scaled`  
+  - `ae_mse`   = Autoencoder reconstruction error on `X_scaled`  
+  - (For the second hybrid variant, the same scores are computed on the 11-feature high-correlation subset.)
+
+- **Inputs from the Supervised Branch (trained on SMOTE, predicted on full data)**  
+  - `rf_pred`  = Random Forest P(`Class` = 1)  
+  - `xgb_pred` = XGBoost P(`Class` = 1)  
+  - `cat_pred` = CatBoost P(`Class` = 1)
+
+- **Build the hybrid feature set**  
+  - Stack these features:  
+    - `[iso_score, ae_mse, rf_pred, xgb_pred, cat_pred]`
+
+- **Meta-classifier: Logistic Regression**  
+  - Train a Logistic Regression model on the **full dataset** using the stacked features.  
+  - Choose a decision **threshold ≈ 0.60** to maximise the F1-score.
+
+- **Final output**  
+  - Final **fraud probability** and a **fraud / non-fraud** decision.  
+  - In the best configuration, the hybrid model achieves **0 false negatives** and only **20 false positives**.
+
