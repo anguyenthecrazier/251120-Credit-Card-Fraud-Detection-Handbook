@@ -3,22 +3,21 @@
 Welcome to the **Interactive Fraud Detection Demo** for the  
 **Credit Card Fraud Detection – MSc Risk Analytics PLA (Group 6)**.
 
-This page turns our technical notebook into an **interactive story**:
+This page turns our technical work into a **story**:
 
-- Explore the **dataset** and its imbalance problem  
-- Compare **unsupervised**, **supervised**, and **hybrid** models  
-- See how a transaction would be **flagged as fraud or not**  
-- Understand **why** the Hybrid model performs best  
+- See the **imbalance problem** in the dataset  
+- Understand the **key EDA insights** that drive model design  
+- Compare **unsupervised**, **supervised**, and the final **Hybrid model**  
+- See how a single **transaction** is turned into a fraud probability  
 
-> This page is *static* (runs in the browser only) – it **illustrates** model
-> behaviour using real results from our notebooks, but does not execute Python
-> live.
+> This page is *static* – it shows results exported from our notebooks,
+> it does **not** run Python in the browser.
 
 ---
 
-## 1. Dataset at a Glance
+## 1. Dataset & Imbalance
 
-We work with the classic **Credit Card Fraud Detection** dataset  
+We use the classic **Credit Card Fraud Detection** dataset  
 (284,807 transactions over 2 days, European cardholders).
 
 | Item | Value |
@@ -26,291 +25,164 @@ We work with the classic **Credit Card Fraud Detection** dataset
 | Total transactions | 284,807 |
 | Fraudulent transactions | 492 |
 | Fraud rate | ~0.172% |
-| Features | 30 (PCA components `V1–V28`, plus `Time`, `Amount`) |
+| Features | 30 (`Time`, `Amount`, PCA components `V1–V28`) |
 | Target | `Class` (0 = legitimate, 1 = fraud) |
 
 !!! warning "Severe class imbalance"
     Only **0.172%** of transactions are fraudulent.  
-    A naïve model that predicts *“everything is normal”* reaches **99.8% accuracy**  
-    but misses **all real frauds**.  
-    → This is why we focus on **recall** and **F1-score**, not accuracy alone.
+    A model that predicts *“everything is normal”* gets **99.8% accuracy**  
+    but misses **all real frauds** → we care about **recall and F1**, not accuracy.
 
 ---
 
-### 1.1 Key Behavioural Patterns
+## 2. What EDA Told Us
 
-!!! info "What we learned from EDA"
-    - **Fraud Amounts**: Many frauds are **small “testing” amounts** with a few
-      very **high-value spikes**.
-    - **Time-of-day effect**: Fraud peaks around **02:00 AM**, when genuine
-      activity is low – but also appears during normal business hours.
-    - **PCA features**: Only **11/30** features have a correlation with `Class`
-      above 0.1, and none above 0.5 → fraud is **complex and non-linear**.
-    - **Distributions**: Many features are skewed and heavy-tailed  
-      → simple linear models and standard scalers are not sufficient.
+From the EDA notebook we learned:
 
-You can see all EDA details in the notebook:
+- **Fraud amounts**  
+  Fraudulent transactions are usually **small “testing” amounts**, with a few **large outliers** where the card is fully exploited.
 
-- 📓 **EDA Notebook**: `notebooks/eda/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb`
+- **Time-of-day pattern**  
+  Fraud is more likely around **~02:00 AM** when normal activity is low,  
+  but still appears during the day → fraud is **not** only a “night-time” event.
 
----
+- **Only 11 truly informative features**  
+  Out of 30 features, only **11** have `|corr(Class)| ≥ 0.1`, and none above 0.5.  
+  → Fraud patterns are **non-linear and multivariate**, not visible in simple correlations.
 
-## 2. Choose a Model
+- **Highly skewed, heavy-tailed features**  
+  Many variables are **skewed** and fraud often lives in the **tails**.  
+  This motivated **log-transformations** (for anomaly detection) and **tree-based methods** (for supervised learning).
 
-Use the tabs below to explore **how each family of models behaves**.  
-Numbers and plots come from our modelling notebook.
-
-> 📓 **Modelling Notebook**:  
-> `notebooks/modelling/Risk_Analytics_PLA_Credit_Card_Fraud.ipynb`
+🔗 Full details in the EDA notebook:  
+`../notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud/`
 
 ---
 
-### 2.1 Unsupervised Models – Anomaly Detectors
+## 3. Model Highlights (One Screen Summary)
 
-These models **do not need labels** during training.  
-They learn what “normal” looks like and flag deviations as **anomalies**.
+### 3.1 Unsupervised – Anomaly Detection
 
-=== "Isolation Forest"
+Train only on **feature patterns**, then flag unusual points.
 
-Isolation Forest isolates anomalies by randomly splitting the data.
+| Model              | Recall (fraud=1) | Precision (1) | Comment |
+|--------------------|------------------|---------------|---------|
+| **Isolation Forest** | ~0.85           | ~0.03         | Catches most frauds, but many false alarms |
+| **Autoencoder**      | ~0.89           | ~0.02         | Strong recall, good for complex patterns, still low precision |
+| **LOF**              | ~0.07           | ~0.003        | Close to random; too many misses and false positives |
 
-**Why we use it**
-
-- Scales well to large datasets  
-- Good at detecting “weird” points in high dimensions  
-
-**Performance (full dataset)**
-
-| Metric (Fraud = Class 1) | Value |
-|--------------------------|-------|
-| Precision (1) | 0.029 |
-| Recall (1) | 0.852 |
-| F1-score (1) | 0.057 |
-| Accuracy | 0.951 |
-
-**Intuition**
-
-- Detects **most frauds** (high recall)  
-- But precision is low → many **false alarms**  
-
-![Isolation Forest Confusion Matrix](../images/iforest_cm.png){ width=400 }
-![Isolation Forest ROC](../images/iforest_roc.png){ width=400 }
+**Takeaway:**  
+Isolation Forest and Autoencoder are the **only unsupervised models worth keeping**.  
+They are later reused as **inputs to the Hybrid model**.
 
 ---
 
-=== "Autoencoder"
+### 3.2 Supervised – Learning from Labels (with SMOTE)
 
-An **Autoencoder** compresses and reconstructs normal transactions.  
-Frauds are detected when the **reconstruction error is high**.
+Here we **balance the classes with SMOTE**, train on the synthetic-balanced data,  
+then **evaluate again on the full original dataset** (no SMOTE).
 
-**Performance (full dataset)**
+| Model          | Recall (1) | Precision (1) | F1 (1) | Notes |
+|----------------|------------|---------------|--------|-------|
+| **Random Forest** | 1.00    | ~0.94        | ~0.97 | 0 false negatives, 32 false positives on full data |
+| **XGBoost**       | 1.00    | ~0.87        | ~0.93 | Also perfect recall, slightly more false positives |
+| **CatBoost**      | 1.00    | ~0.86        | ~0.92 | Good overall; uses a broader set of features |
+| AdaBoost          | ~0.90   | ~0.09        | ~0.16 | Too many false alarms |
+| LightGBM          | 1.00    | ~0.01        | ~0.01 | Extremely high false positive rate |
 
-| Metric (Fraud = Class 1) | Value |
-|--------------------------|-------|
-| Precision (1) | 0.015 |
-| Recall (1) | 0.894 |
-| F1-score (1) | 0.030 |
-| Accuracy | 0.901 |
-
-**Strengths**
-
-- Very good at capturing **complex, non-linear patterns**  
-- High recall: detects most frauds  
-
-**Weaknesses**
-
-- Very low precision → large manual review workload  
-- Needs careful architecture / threshold tuning  
-
-![Autoencoder Confusion Matrix](../images/autoencoder_cm.png){ width=400 }
+**Takeaway:**  
+- **Random Forest** is the **best single supervised model**.  
+- XGBoost and CatBoost are also **strong** and kept for the Hybrid.  
+- AdaBoost & LightGBM are **not used** in the final system.
 
 ---
 
-=== "Local Outlier Factor (LOF)"
+### 3.3 Hybrid Meta-Model – Final Candidate
 
-LOF compares the **local density** of each point with its neighbours.
+The **Hybrid model** combines:
 
-- In theory good for **local anomalies**
-- In practice here, performance is **poor** due to:
-  - high dimensionality
-  - strong imbalance
-  - overlapping distributions
+- Unsupervised outputs:  
+  - **Isolation Forest** anomaly score (`iso_score`)  
+  - **Autoencoder** reconstruction error (`ae_mse`)
+- Supervised outputs (trained on **SMOTE-balanced** data, then predicted on the **full** dataset):  
+  - **Random Forest**, **XGBoost**, **CatBoost** predicted probabilities (`rf_pred`, `xgb_pred`, `cat_pred`)
+- Meta-classifier: **Logistic Regression**, with a threshold chosen to maximise **F1**  
+  - Best thresholds ≈ **0.61** (Hybrid 1 – full data) and **0.597** (Hybrid 2 – high-correlated subset)
 
-| Metric (Fraud = Class 1) | Value |
-|--------------------------|-------|
-| Precision (1) | 0.003 |
-| Recall (1) | 0.071 |
-| F1-score (1) | 0.005 |
-| Accuracy | 0.949 |
+**Performance on full dataset (Hybrid 1 & 2):**
 
-![LOF ROC](../images/lof_roc.png){ width=400 }
+| Metric (Fraud = 1) | Value |
+|--------------------|-------|
+| Precision (1)      | 0.9609 |
+| Recall (1)         | 1.0000 |
+| F1-score (1)       | 0.9801 |
+| Accuracy           | 0.9999 |
+| False Positives    | 20 |
+| False Negatives    | 0 |
 
-> LOF performs **close to random guessing** in this dataset and is **not**
-> selected for the final hybrid system.
+**Takeaway:**  
+The Hybrid model keeps **perfect recall**, **reduces false positives** further than Random Forest alone, and benefits from **both anomaly signals and supervised scores**.
 
----
-
-### 2.2 Supervised Models – Learning from Labels
-
-These models train on **labelled fraud vs non-fraud** transactions  
-(using **SMOTE** oversampling for the minority class).
-
-=== "Random Forest"
-
-Random Forest is our **best standalone supervised model**.
-
-| Metric (Fraud = Class 1) | Value |
-|--------------------------|-------|
-| Precision (1) | 0.939 |
-| Recall (1) | 1.000 |
-| F1-score (1) | 0.969 |
-| Accuracy | 0.9999 |
-
-- No **false negatives** on the test set  
-- Only **32 false positives** out of 284,807 transactions  
-- Provides useful **feature importance** rankings  
-
-![Random Forest Confusion Matrix](../images/rf_cm.png){ width=400 }
-![Random Forest ROC](../images/rf_roc.png){ width=400 }
+🔗 Full model details:  
+`../notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud/`
 
 ---
 
-=== "XGBoost"
+## 4. How the Data & Models Flow (Pipeline)
 
-Gradient-boosted trees with strong performance on imbalanced data.
-
-| Metric (Fraud = Class 1) | Value |
-|--------------------------|-------|
-| Precision (1) | 0.872 |
-| Recall (1) | 1.000 |
-| F1-score (1) | 0.932 |
-| Accuracy | 0.9997 |
-
-- Also achieves **zero false negatives**  
-- Slightly more false positives than Random Forest
-
-![XGBoost Confusion Matrix](../images/xgb_cm.png){ width=400 }
-
----
-
-=== "CatBoost"
-
-Handles categorical-like behaviour and complex interactions well.
-
-| Metric (Fraud = Class 1) | Value |
-|--------------------------|-------|
-| Precision (1) | 0.859 |
-| Recall (1) | 1.000 |
-| F1-score (1) | 0.924 |
-| Accuracy | 0.9997 |
-
-![CatBoost Confusion Matrix](../images/catboost_cm.png){ width=400 }
-
----
-
-=== "AdaBoost & LightGBM"
-
-These models underperformed on this dataset:
-
-| Model | Precision (1) | Recall (1) | F1-score (1) | Notes |
-|-------|---------------|-----------|--------------|-------|
-| AdaBoost | 0.088 | 0.900 | 0.160 | Many false positives |
-| LightGBM | 0.007 | 1.000 | 0.014 | Extremely high false positive rate |
-
-> We **do not include** these models in the final hybrid system  
-> due to their **poor precision**.
-
----
-
-### 2.3 Hybrid Model – Best of Both Worlds
-
-The final production candidate is a **Hybrid Model** that combines:
-
-- Unsupervised: **Isolation Forest**, **Autoencoder**  
-- Supervised: **Random Forest**, **XGBoost**, **CatBoost**  
-- Meta-classifier: **Logistic Regression**
-
-Each base model outputs a score, and the meta-classifier learns how to
-**optimally weight** them.
-
-| Metric (Fraud = Class 1) | Value |
-|--------------------------|-------|
-| Precision (1) | 0.961 |
-| Recall (1) | 1.000 |
-| F1-score (1) | 0.980 |
-| Accuracy | 0.9999 |
-| False Positives | 20 |
-| False Negatives | 0 |
-
-![Hybrid Confusion Matrix](../images/hybrid_cm.png){ width=400 }
-![Hybrid PR Curve](../images/hybrid_pr.png){ width=400 }
-
-!!! success "Why the Hybrid Model is preferred"
-    - Keeps the **perfect recall** of the best supervised models  
-    - **Reduces false positives** compared with Random Forest alone  
-    - Adds **anomaly-detection signals** from unsupervised models  
-    - More robust to **new, unseen fraud patterns**
-
----
-
-## 3. How the Hybrid Pipeline Works
-
-### 3.1 Visual pipeline diagram
-## 3. Data Pipeline Overview
-
-### 3.1 Data Processing & Modeling Pipeline (Diagram)
+This section now matches the **exact logic** used in the *Models* notebook.
 
 ```text
-                           DATA PIPELINE OVERVIEW
-                           =======================
+                        RAW DATA
+      (Time, Amount, V1–V28, Class = 0/1, highly imbalanced)
+                             │
+                ┌────────────┴────────────┐
+                │                         │
+                v                         v
+      UNSUPERVISED BRANCH         SUPERVISED BRANCH
+ (Anomaly detection + Hybrid)   (Tree/boosting models)
 
-                       ┌────────────────────────────┐
-                       │      Raw Transaction       │
-                       │   (Time, Amount, V1–V28)   │
-                       └──────────────┬─────────────┘
-                                      │
-                                      v
-                 ┌──────────────────────────────────────────┐
-                 │            Data Preprocessing            │
-                 │------------------------------------------│
-                 │ • Remove duplicates                      │
-                 │ • Handle missing values                  │
-                 │ • Log-transform skewed features          │
-                 │ • MinMax scaling                         │
-                 │ • Train-test split                       │
-                 └──────────────┬───────────────────────────┘
-                                │
-                                v
-                 ┌──────────────────────────────────────────┐
-                 │              Data Balancing               │
-                 │-------------------------------------------│
-                 │ • Apply SMOTE to minority class           │
-                 │   (fraud = 1) on training data only       │
-                 └──────────────┬───────────────────────────┘
-                                │
-                                v
-    ┌───────────────────────────────────────────────────────────────────────────┐
-    │                                 Modeling                                  │
-    │---------------------------------------------------------------------------│
-    │ Unsupervised Models:                  Supervised Models:                  │
-    │ • Isolation Forest                    • Random Forest                     │
-    │ • Autoencoder                         • XGBoost                           │
-    │ • Local Outlier Factor (LOF)          • CatBoost                          │
-    └──────────────┬───────────────┬───────────────┬───────────────┬──────────┘
-                   │               │               │               │
-                   v               v               v               v
-        ┌────────────────┐ ┌────────────────┐ ┌────────────────┐ ┌────────────────┐
-        │  IF Score      │ │ AE Recon Error │ │ RF Probability │ │ XGB Probability │
-        └────────────────┘ └────────────────┘ └────────────────┘ └────────────────┘
-                                  │
-                                  v
-                       ┌─────────────────────────────┐
-                       │  Meta-Model (Logistic Reg.) │
-                       │ Combines all model outputs  │
-                       └──────────────┬──────────────┘
-                                      │
-                                      v
-                       ┌─────────────────────────────┐
-                       │ Final Fraud Probability     │
-                       │   (Decision Threshold ≈ .60)│
-                       └─────────────────────────────┘
+UNSUPERVISED BRANCH
+-------------------
+1. Log-transform highly skewed features
+   • For each feature except Class, if |skew| > 0.75 → apply custom log transform.
+2. MinMax scaling
+   • Scale all features (Time, V1–V28, Amount) into a common range → X_scaled.
+3. Train anomaly detectors on the FULL X_scaled, y:
+   • Isolation Forest, One-Class SVM, LOF, Autoencoder.
+4. Build high-correlated subset for improved unsupervised models:
+   • Keep only 11 features with |corr(Class)| ≥ 0.1 and repeat anomaly detection.
+
+SUPERVISED BRANCH
+-----------------
+1. Work in the ORIGINAL feature space (no MinMax scaling here).
+2. Apply SMOTE on df (all 30 features):
+   • Balance Class 0 and Class 1 → X_res, y_res.
+3. Train-test split on the SMOTE data:
+   • (X_train, X_test, y_train, y_test).
+4. Train supervised models:
+   • Random Forest, XGBoost, CatBoost, AdaBoost, LightGBM.
+5. Re-evaluate trained models on the FULL original dataset df
+   • to mimic real-life deployment (heavily imbalanced data).
+
+HYBRID MODEL
+------------
+1. From the UNSUPERVISED branch (on scaled data):
+   • iso_score  = Isolation Forest score on X_scaled
+   • ae_mse     = Autoencoder reconstruction error on X_scaled
+   • (and, for Model 2, the same but trained on the 11 high-correlated features)
+
+2. From the SUPERVISED branch (trained on SMOTE, predicted on full df):
+   • rf_pred   = Random Forest P(Class=1)
+   • xgb_pred  = XGBoost P(Class=1)
+   • cat_pred  = CatBoost P(Class=1)
+
+3. Stack all these into a hybrid feature set:
+   • [iso_score, ae_mse, rf_pred, xgb_pred, cat_pred].
+
+4. Train Logistic Regression meta-model on the full dataset:
+   • Choose threshold ≈ 0.60 to maximise F1.
+
+5. Output:
+   • Final fraud probability + binary decision
+   • Achieves 0 false negatives and only 20 false positives.
