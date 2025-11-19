@@ -58,73 +58,102 @@ From the EDA notebook we learned:
 `../notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud/`
 
 ---
+## 3. Models & Key Results
 
-## 3. Model Highlights
+We evaluate three categories:
 
-### 3.1 Unsupervised – Anomaly Detection
+- **Unsupervised anomaly detection**  
+- **Supervised machine learning (with SMOTE)**  
+- **A final Hybrid meta-model combining all signals**
 
-Train only on **feature patterns**, then flag unusual points.
-
-| Model              | Recall (fraud=1) | Precision (1) | Comment |
-|--------------------|------------------|---------------|---------|
-| **Isolation Forest** | ~0.85           | ~0.03         | Catches most frauds, but many false alarms |
-| **Autoencoder**      | ~0.89           | ~0.02         | Strong recall, good for complex patterns, still low precision |
-| **LOF**              | ~0.07           | ~0.003        | Close to random; too many misses and false positives |
-
-**Takeaway:**  
-Isolation Forest and Autoencoder are the **only unsupervised models worth keeping**.  
-They are later reused as **inputs to the Hybrid model**.
+All performance numbers below are evaluated on the **full original dataset**  
+(no SMOTE used in evaluation).
 
 ---
 
-### 3.2 Supervised – Learning from Labels (with SMOTE)
+## 3.1 Unsupervised Models — Anomaly Detection
 
-Here we **balance the classes with SMOTE**, train on the synthetic-balanced data,  
-then **evaluate again on the full original dataset** (no SMOTE).
+From all tested methods, two consistently performed best:
 
-| Model          | Recall (1) | Precision (1) | F1 (1) | Notes |
-|----------------|------------|---------------|--------|-------|
-| **Random Forest** | 1.00    | ~0.94        | ~0.97 | 0 false negatives, 32 false positives on full data |
-| **XGBoost**       | 1.00    | ~0.87        | ~0.93 | Also perfect recall, slightly more false positives |
-| **CatBoost**      | 1.00    | ~0.86        | ~0.92 | Good overall; uses a broader set of features |
-| AdaBoost          | ~0.90   | ~0.09        | ~0.16 | Too many false alarms |
-| LightGBM          | 1.00    | ~0.01        | ~0.01 | Extremely high false positive rate |
+### **Chosen Unsupervised Models**
+- **Isolation Forest**
+- **Autoencoder**
 
-**Takeaway:**  
-- **Random Forest** is the **best single supervised model**.  
-- XGBoost and CatBoost are also **strong** and kept for the Hybrid.  
-- AdaBoost & LightGBM are **not used** in the final system.
+### **Performance**
+
+| Method | Precision (1) | Recall (1) | F1-score (1) | Accuracy |
+|--------|---------------|------------|--------------|----------|
+| Isolation Forest (Full) | **0.0294** | **0.9514** | **0.0569** | **0.9512** |
+| Autoencoder (Full) | **0.0154** | **0.9014** | **0.0304** | **0.9014** |
+| Isolation Forest (High-Corr) | **0.0310** | **0.9515** | **0.0599** | **0.9514** |
+| Autoencoder (High-Corr) | **0.0157** | **0.9014** | **0.0309** | **0.9014** |
+
+!!! info "Interpretation"
+    - High recall → they catch most frauds  
+    - Low precision (typical for anomaly detectors)  
+    - Their scores become **powerful Hybrid model inputs**
 
 ---
 
-### 3.3 Hybrid Meta-Model – Final Candidate
+## 3.2 Supervised Models — Learning From Labels (with SMOTE)
 
-The **Hybrid model** combines:
+Supervised models were trained on **SMOTE-balanced** data  
+and evaluated on the **full dataset**.
 
-- Unsupervised outputs:  
-  - **Isolation Forest** anomaly score (`iso_score`)  
-  - **Autoencoder** reconstruction error (`ae_mse`)
-- Supervised outputs (trained on **SMOTE-balanced** data, then predicted on the **full** dataset):  
-  - **Random Forest**, **XGBoost**, **CatBoost** predicted probabilities (`rf_pred`, `xgb_pred`, `cat_pred`)
-- Meta-classifier: **Logistic Regression**, with a threshold chosen to maximise **F1**  
-  - Best thresholds ≈ **0.61** (Hybrid 1 – full data) and **0.597** (Hybrid 2 – high-correlated subset)
+### **All Supervised Models Tested**
 
-**Performance on full dataset (Hybrid 1 & 2):**
+| Model | Precision (1) | Recall (1) | F1-score (1) | Accuracy | Notes |
+|-------|---------------|------------|--------------|----------|--------|
+| **Random Forest** | **0.9389** | **0.9999** | **0.9685** | **0.9999** | Kept for Hybrid |
+| **XGBoost** | **0.8723** | **0.9999** | **0.9318** | **0.9997** | Kept for Hybrid |
+| **CatBoost** | **0.8586** | **0.9997** | **0.9239** | **0.9997** | Kept for Hybrid |
+| **AdaBoost** | **0.0902** | **0.8951** | **0.1639** | **0.8950** | Excluded |
+| **LightGBM** | **0.0094** | **1.0000** | **0.0186** | **0.8735** | Excluded |
 
-| Metric (Fraud = 1) | Value |
-|--------------------|-------|
-| Precision (1)      | 0.9609 |
-| Recall (1)         | 1.0000 |
-| F1-score (1)       | 0.9801 |
-| Accuracy           | 0.9999 |
-| False Positives    | 20 |
-| False Negatives    | 0 |
+!!! failure "Why not AdaBoost or LightGBM?"
+    - **AdaBoost**: precision only **0.09** → too many false alarms  
+    - **LightGBM**: precision **0.009** despite perfect recall  
+    → Both unsuitable for real-world use
 
-**Takeaway:**  
-The Hybrid model keeps **perfect recall**, **reduces false positives** further than Random Forest alone, and benefits from **both anomaly signals and supervised scores**.
+---
 
-🔗 Full model details:  
-`../notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud/`
+## 3.3 Hybrid Meta-Model — Final System
+
+The Hybrid model combines **unsupervised anomaly scores**  
+and **supervised predicted probabilities**, using:
+
+### **Inputs**
+**Unsupervised signals**
+- Isolation Forest score (`iso_score`)
+- Autoencoder reconstruction error (`ae_mse`)
+
+**Supervised signals**
+- Random Forest (`rf_pred`)
+- XGBoost (`xgb_pred`)
+- CatBoost (`cat_pred`)
+
+### **Meta-classifier**
+- **Logistic Regression**
+- Threshold optimized for **max F1**
+  - ~0.61 (Full data)
+  - ~0.597 (High-Corr)
+
+### **Hybrid Performance**
+
+| Metric | Value |
+|--------|-------|
+| **Precision (1)** | **0.9609** |
+| **Recall (1)** | **1.0000** |
+| **F1-score (1)** | **0.9801** |
+| **Accuracy** | **0.9999** |
+| **False Positives** | **20** |
+| **False Negatives** | **0** |
+
+!!! success "Why Hybrid Wins"
+    - Perfect recall  
+    - Best precision  
+    - Lowest false positives  
+    - Integrates structural anomaly signals + supervised evidence
 
 ---
 
