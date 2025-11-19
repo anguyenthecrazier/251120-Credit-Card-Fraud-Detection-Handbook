@@ -22,10 +22,24 @@ plugins:
 nav:
   - Home: index.md
   - Interactive Demo: demo.md
+
   - Exploratory Data Analysis:
       - EDA: notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
+
   - Models:
-      - Modelling: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
+      - Overview (Full Notebook): notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
+      - Unsupervised:
+          - Isolation Forest: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb#isolation-forest
+          - Local Outlier Factor (LOF): notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb#local-outlier-factor-lof
+          - One-Class SVM: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb#one-class-svm
+          - Autoencoder: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb#autoencoder
+      - Supervised:
+          - Logistic Regression: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb#logistic-regression
+          - Random Forest: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb#random-forest
+          - XGBoost: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb#xgboost
+          - LightGBM: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb#lightgbm
+      - Hybrid:
+          - Hybrid Model: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb#hybrid-model
   - Conclusion: conclusion.md
 
 markdown_extensions:
