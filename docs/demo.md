@@ -132,43 +132,35 @@ The Hybrid model keeps **perfect recall**, **reduces false positives** further t
 
 This section follows the same logic used in the *Models* notebook and the predictive-models poster.
 
-```text
-                PROJECT WORKFLOW OVERVIEW
-==================================================
+``` 
+RAW DATA
+(Time, Amount, V1–V28, Class = 0/1, heavily imbalanced)
 
-                   RAW DATA
-   (Time, Amount, V1–V28, Class = 0/1, imbalanced)
-                         │
-                         v
-                -------------------
-                |  PREPROCESSING  |
-                -------------------
-                • Log transform skewed features
-                • MinMaxScaler (for anomaly detection)
-                • SMOTE (for supervised learning)
-                         │
-            ┌────────────┴────────────┐
-            │                         │
-            v                         v
+        ↓
 
-   UNSUPERVISED LEARNING       SUPERVISED LEARNING
-   ----------------------       --------------------
-      Isolation Forest              Random Forest
-      Autoencoder                   XGBoost
-      (Full + High-correlation)     CatBoost
-                         │
-                         v
+PREPROCESSING
+- Log transform skewed features
+- MinMaxScaler (for anomaly detection branch)
+- SMOTE (for supervised learning branch)
 
-                ----------------------------
-                |   HYBRID META-MODEL     |
-                ----------------------------
-                • Logistic Regression
-                • Inputs = unsupervised + supervised scores
-                         │
-                         v
+        ↓
 
-               FINAL FRAUD PROBABILITY
-           (Optimised decision threshold ~0.60)
+UNSUPERVISED LEARNING               SUPERVISED LEARNING
+- Isolation Forest (full +          - Random Forest
+  high-correlation datasets)        - XGBoost
+- Autoencoder (full +               - CatBoost
+  high-correlation datasets)
+
+        ↓
+
+HYBRID META-MODEL (Logistic Regression)
+- Inputs = unsupervised scores + supervised probabilities
+
+        ↓
+
+FINAL FRAUD PROBABILITY
+(Optimised decision threshold ≈ 0.60)
+```
 
 
 UNSUPERVISED BRANCH
