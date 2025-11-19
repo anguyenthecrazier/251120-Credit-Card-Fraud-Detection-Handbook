@@ -59,7 +59,7 @@ From the EDA notebook we learned:
 
 ---
 
-## 3. Model Highlights (One Screen Summary)
+## 3. Model Highlights
 
 ### 3.1 Unsupervised – Anomaly Detection
 
@@ -127,10 +127,6 @@ The Hybrid model keeps **perfect recall**, **reduces false positives** further t
 `../notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud/`
 
 ---
-
-## 4. How the Data & Models Flow (Pipeline)
-
-This section now matches the **exact logic** used in the *Models* notebook.
 
 ## 4. How the Data & Models Flow (Pipeline)
 
