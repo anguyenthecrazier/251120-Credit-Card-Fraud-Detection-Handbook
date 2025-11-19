@@ -6,10 +6,6 @@ This site contains:
 
 - 📊 Full EDA  
 - 🧠 Machine Learning Models  
-- 📈 Anomaly Detection  
-- 🏗 Hybrid Ensemble Architecture  
-- 🔍 Threshold optimization  
-- 🧪 Evaluation & metrics  
 - 📁 Fully reproducible notebooks  
 - 💻 Interactive demo  
 
