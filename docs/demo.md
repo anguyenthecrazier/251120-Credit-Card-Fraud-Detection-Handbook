@@ -132,15 +132,48 @@ The Hybrid model keeps **perfect recall**, **reduces false positives** further t
 
 This section now matches the **exact logic** used in the *Models* notebook.
 
+## 4. How the Data & Models Flow (Pipeline)
+
+This section follows the same logic used in the *Models* notebook and the predictive-models poster.
+
 ```text
-RAW DATA
-(Time, Amount, V1–V28, Class = 0/1, highly imbalanced)
-                             │
-                ┌────────────┴────────────┐
-                │                         │
-                v                         v
-      UNSUPERVISED BRANCH         SUPERVISED BRANCH
- (Anomaly detection + Hybrid)   (Tree/boosting models)
+                PROJECT WORKFLOW OVERVIEW
+==================================================
+
+                   RAW DATA
+   (Time, Amount, V1–V28, Class = 0/1, imbalanced)
+                         │
+                         v
+                -------------------
+                |  PREPROCESSING  |
+                -------------------
+                • Log transform skewed features
+                • MinMaxScaler (for anomaly detection)
+                • SMOTE (for supervised learning)
+                         │
+            ┌────────────┴────────────┐
+            │                         │
+            v                         v
+
+   UNSUPERVISED LEARNING       SUPERVISED LEARNING
+   ----------------------       --------------------
+      Isolation Forest              Random Forest
+      Autoencoder                   XGBoost
+      (Full + High-correlation)     CatBoost
+                         │
+                         v
+
+                ----------------------------
+                |   HYBRID META-MODEL     |
+                ----------------------------
+                • Logistic Regression
+                • Inputs = unsupervised + supervised scores
+                         │
+                         v
+
+               FINAL FRAUD PROBABILITY
+           (Optimised decision threshold ~0.60)
+
 
 UNSUPERVISED BRANCH
 -------------------
