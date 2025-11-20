@@ -52,11 +52,11 @@ From the EDA notebook we learned:
   
 
 - **Highly skewed, heavy-tailed features**  
-  Many variables are **skewed** and fraud often lives in the **tails**.  
+  Many variables are **skewed** and fraud often lies in the **tails**.  
   This motivated **log-transformations** (for anomaly detection) and **tree-based methods** (for supervised learning).
 
 - **Multivariate regression confirms weak linear separability**
-Logistic regression achieves strong ranking performance (ROC-AUC 0.97), but low precision at default thresholds.
+  Logistic regression achieves strong ranking performance (ROC-AUC 0.97), but low precision at default thresholds.
 → Fraud patterns exist, but they are subtle, imbalanced, and non-linear, motivating more advanced models.
 
 🔗 Full details in the EDA notebook:  
