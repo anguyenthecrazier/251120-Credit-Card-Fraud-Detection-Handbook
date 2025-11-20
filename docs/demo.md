@@ -56,7 +56,8 @@ From the EDA notebook we learned:
   This motivated **log-transformations** (for anomaly detection) and **tree-based methods** (for supervised learning).
 
 - **Multivariate regression confirms weak linear separability**
-  Logistic Regression achieves excellent ranking capability (ROC-AUC ≈ **0.97**) but **precision remains poor** at standard thresholds because fraud is rare and subtle.  
+  
+  Logistic Regression achieves an excellent ranking capability (ROC-AUC ≈ **0.97**), but **precision remains poor** at standard thresholds because fraud is rare and often subtle.  
   → Linear models recognize some patterns but **cannot separate fraud cleanly**, motivating more advanced, non-linear models.
 
 🔗 Full details in the EDA notebook:  
