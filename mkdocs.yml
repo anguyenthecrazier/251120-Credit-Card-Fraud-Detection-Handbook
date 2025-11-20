@@ -30,7 +30,7 @@ nav:
       - EDA: notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
 
   - Models:
-      - Overview: models.md          # <-- New ToC page
+      - Overview (Full Notebook): notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb
       - Unsupervised:
           - Isolation Forest: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#32-isolation-forest
           - One-Class SVM: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#33-one-class-svm
