@@ -39,23 +39,28 @@ We use the classic **Credit Card Fraud Detection** dataset
 
 From the EDA notebook we learned:
 
-- **Fraud amounts**  
+- **Fraud amounts**
+  
   Fraudulent transactions are usually **small “testing” amounts**, with a few **large outliers** where the card is fully exploited.
 
-- **Time-of-day pattern**  
+- **Time-of-day pattern**
+  
   Fraud is more likely around **~02:00 AM** when normal activity is low,  
   but still appears during the day → fraud is **not** only a “night-time” event.
 
-- **Only 11 truly informative features**  
+- **Only 11 truly informative features**
+  
   Out of 30 features, only **11** have `|corr(Class)| ≥ 0.1`, and none above 0.5.  
   → Fraud patterns are **non-linear and multivariate**, not visible in simple correlations.
   
 
-- **Highly skewed, heavy-tailed features**  
+- **Highly skewed, heavy-tailed features**
+  
   Many variables are **skewed** and fraud often lies in the **tails**.  
   This motivated **log-transformations** (for anomaly detection) and **tree-based methods** (for supervised learning).
 
 - **Multivariate regression confirms weak linear separability**
+  
   Logistic Regression achieves an excellent ranking capability (ROC-AUC ≈ **0.97**), but **precision remains poor** at standard thresholds because fraud is rare and often subtle.  
   → Linear models recognize some patterns but **cannot separate fraud cleanly**, motivating more advanced, non-linear models.
 
