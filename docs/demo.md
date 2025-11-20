@@ -49,10 +49,15 @@ From the EDA notebook we learned:
 - **Only 11 truly informative features**  
   Out of 30 features, only **11** have `|corr(Class)| ≥ 0.1`, and none above 0.5.  
   → Fraud patterns are **non-linear and multivariate**, not visible in simple correlations.
+  
 
 - **Highly skewed, heavy-tailed features**  
   Many variables are **skewed** and fraud often lives in the **tails**.  
   This motivated **log-transformations** (for anomaly detection) and **tree-based methods** (for supervised learning).
+
+- **Multivariate regression confirms weak linear separability**
+Logistic regression achieves strong ranking performance (ROC-AUC 0.97), but low precision at default thresholds.
+→ Fraud patterns exist, but they are subtle, imbalanced, and non-linear, motivating more advanced models.
 
 🔗 Full details in the EDA notebook:  
 `../notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud/`
