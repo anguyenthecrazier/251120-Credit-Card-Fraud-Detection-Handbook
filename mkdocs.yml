@@ -12,7 +12,7 @@ theme:
     - navigation.top
     - navigation.expand
     - navigation.path
-    - toc.integrate         
+    - toc.integrate
     - content.code.copy
     - search.suggest
     - search.highlight
@@ -25,12 +25,11 @@ plugins:
 nav:
   - Home: index.md
   - Interactive Demo: demo.md
-
   - Exploratory Data Analysis:
       - EDA: notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
-
   - Models:
       - Overview (Full Notebook): notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb
+
       - Unsupervised:
           - Isolation Forest: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#32-isolation-forest
           - One-Class SVM: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#33-one-class-svm
