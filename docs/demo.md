@@ -56,8 +56,8 @@ From the EDA notebook we learned:
   This motivated **log-transformations** (for anomaly detection) and **tree-based methods** (for supervised learning).
 
 - **Multivariate regression confirms weak linear separability**
-  Logistic regression achieves strong ranking performance (ROC-AUC 0.97), but low precision at default thresholds.
-  → Fraud patterns exist, but they are subtle, imbalanced, and non-linear, motivating more advanced models.
+  Logistic Regression achieves excellent ranking capability (ROC-AUC ≈ **0.97**) but **precision remains poor** at standard thresholds because fraud is rare and subtle.  
+  → Linear models recognize some patterns but **cannot separate fraud cleanly**, motivating more advanced, non-linear models.
 
 🔗 Full details in the EDA notebook:  
 `../notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud/`
