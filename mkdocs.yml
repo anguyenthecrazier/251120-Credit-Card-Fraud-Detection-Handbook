@@ -1,3 +1,24 @@
+site_name: Credit Card Fraud Detection Handbook
+site_url: https://anguyenthecrazier.github.io/251120-Credit-Card-Fraud-Detection-Handbook/
+site_description: A complete end-to-end analysis for building a hybrid machine-learning credit card fraud detection system.
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.sections
+    - navigation.tabs
+    - navigation.instant
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+
+plugins:
+  - search
+  - mkdocs-jupyter
+  - awesome-pages
+
 nav:
   - Home: index.md
   - Interactive Demo: demo.md
@@ -6,11 +27,9 @@ nav:
       - EDA: notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
 
   - Models:
-      # Full pages for each notebook
       - "Main Models (Full Notebook)": notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb
       - "Extra Models (AdaBoost & LightGBM)": notebooks/ExtraModels_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
 
-      # Anchor links inside the notebooks
       - Unsupervised:
           - Isolation Forest: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#32-isolation-forest
           - One-Class SVM: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#33-one-class-svm
