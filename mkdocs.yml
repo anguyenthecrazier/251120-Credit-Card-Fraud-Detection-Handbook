@@ -1,24 +1,3 @@
-site_name: Credit Card Fraud Detection Handbook
-site_url: https://anguyenthecrazier.github.io/251120-Credit-Card-Fraud-Detection-Handbook/
-site_description: A complete end-to-end analysis for building a hybrid machine-learning credit card fraud detection system by Group 6 - Queen Mary University of London MSc Risk Analytics - November 2025
-
-theme:
-  name: material
-  language: en
-  features:
-    - navigation.sections
-    - navigation.tabs
-    - navigation.instant
-    - navigation.top
-    - content.code.copy
-    - search.suggest
-    - search.highlight
-
-plugins:
-  - search
-  - mkdocs-jupyter
-  - awesome-pages
-
 nav:
   - Home: index.md
   - Interactive Demo: demo.md
@@ -27,26 +6,26 @@ nav:
       - EDA: notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
 
   - Models:
-      - Unsupervised:
-          - Isolation Forest: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2#32-isolation-forest
-          - One-Class SVM: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2#33-one-class-svm
-          - Local Outlier Factor (LOF): notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2/#34-local-outlier-factor-lof
-          - Autoencoder: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2#35-autoencoders
-          - Anomaly Detection: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2/#4-anomaly-detection-with-high-correlated-features
-      - Supervised:
-          - Random Forest: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2#52-random-forest
-          - XGBoost: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2#53-xgboost
-          - AdaBoost: notebooks/ExtraModels_Risk_Analytics_PLA_Credit_Card_Fraud#54-adaboost-classifier
-          - CatBoost: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2#55-catboost-classifier
-          - LightGBM: notebooks/ExtraModels_Risk_Analytics_PLA_Credit_Card_Fraud#56-light-gbm
-      - Hybrid:
-          - Hybrid Model: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2#61-hybrid-model-with-full-dataset
-  - Conclusion: conclusion.md
+      # Full pages for each notebook
+      - "Main Models (Full Notebook)": notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb
+      - "Extra Models (AdaBoost & LightGBM)": notebooks/ExtraModels_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb
 
-markdown_extensions:
-  - admonition
-  - toc:
-      permalink: true
-  - attr_list
-  - pymdownx.details
-  - pymdownx.superfences
+      # Anchor links inside the notebooks
+      - Unsupervised:
+          - Isolation Forest: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#32-isolation-forest
+          - One-Class SVM: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#33-one-class-svm
+          - Local Outlier Factor (LOF): notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#34-local-outlier-factor-lof
+          - Autoencoder: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#35-autoencoders
+          - Anomaly Detection: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#4-anomaly-detection-with-high-correlated-features
+
+      - Supervised:
+          - Random Forest: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#52-random-forest
+          - XGBoost: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#53-xgboost
+          - AdaBoost: notebooks/ExtraModels_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb#54-adaboost-classifier
+          - CatBoost: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#55-catboost-classifier
+          - LightGBM: notebooks/ExtraModels_Risk_Analytics_PLA_Credit_Card_Fraud.ipynb#56-light-gbm
+
+      - Hybrid:
+          - Hybrid Model: notebooks/Models_Risk_Analytics_PLA_Credit_Card_Fraud_2.ipynb#61-hybrid-model-with-full-dataset
+
+  - Conclusion: conclusion.md
