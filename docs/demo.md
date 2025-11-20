@@ -57,7 +57,7 @@ From the EDA notebook we learned:
 
 - **Multivariate regression confirms weak linear separability**
   Logistic regression achieves strong ranking performance (ROC-AUC 0.97), but low precision at default thresholds.
-→ Fraud patterns exist, but they are subtle, imbalanced, and non-linear, motivating more advanced models.
+  → Fraud patterns exist, but they are subtle, imbalanced, and non-linear, motivating more advanced models.
 
 🔗 Full details in the EDA notebook:  
 `../notebooks/EDA_Risk_Analytics_PLA_Credit_Card_Fraud/`
